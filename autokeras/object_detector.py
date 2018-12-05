@@ -29,6 +29,7 @@ import numpy as np
 import pickle
 import cv2
 from matplotlib import pyplot as plt
+from matplotlib.ticker import NullLocator
 
 if sys.version_info[0] == 2:
     import xml.etree.cElementTree as ET
@@ -75,6 +76,7 @@ class Timer(object):
 
 class ObjectDetector(Pretrained):
     def __init__(self, cuda=False):
+        super().__init__(cuda)
         self.cuda = cuda
         self.model = None
 
@@ -93,14 +95,13 @@ class ObjectDetector(Pretrained):
         if model_path is None:
             file_link = Constant.PRE_TRAIN_DETECTION_FILE_LINK
             # temp_path_generator() + '_object_detection_pretrained'
-            model_path = os.path.join(temp_path_generator(), "object_detection_pretrained.pth")
+            model_path = temp_path_generator() + "_object_detection_pretrained.pth"
             download_file(file_link, model_path)
         # load net
         num_classes = len(labelmap) + 1                      # +1 for background
         self.model = build_ssd('test', 300, num_classes)            # initialize SSD
         if trained_device not in ['cpu', 'gpu']:
             raise ValueError("trained_device must be either 'cpu' or 'gpu'!")
-            exit(0)
         if trained_device == 'gpu' and self.cuda is False:
             self.model.load_state_dict(torch.load(model_path, map_location=lambda storage, loc: storage))
         else:
@@ -246,7 +247,6 @@ class ObjectDetector(Pretrained):
         Returns:
             List of tuples. Each tuple is like ((x1, y1), (h, w), category, confidence).
         """
-        from matplotlib.ticker import NullLocator
 
         dataset_mean = (104, 117, 123)
 

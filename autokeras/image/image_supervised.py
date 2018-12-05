@@ -266,7 +266,7 @@ class PortableImageSupervised(PortableClass):
         outputs = []
         with torch.no_grad():
             for index, inputs in enumerate(test_loader):
-                outputs.append(model(inputs).numpy())
+                outputs.append(model(inputs).cpu().numpy())
         output = reduce(lambda x, y: np.concatenate((x, y)), outputs)
         return self.inverse_transform_y(output)
 
